@@ -1,6 +1,6 @@
 # Installation
 
-Download **ScriptCheck.zip** from [Releases](https://github.com/ElliottSullingeFarrall/ScriptCheck/releases/latest) and unzip.
+Download **ScriptCheck.zip** from [Releases](https://github.com/ElliottSullingeFarrall/ScriptCheck/releases/latest) and unzip. This will include all the necessary files/folders with example data.
 
 # Usage
 
