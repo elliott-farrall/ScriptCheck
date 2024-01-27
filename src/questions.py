@@ -2,9 +2,9 @@
 questions = {
     "add" : {
         "vars" : [
-            "tmp"
+            "tmpppppppppp"
         ],
-        "test" : [
+        "tests" : [
             (1, 2),
             (3, 4)
         ]
@@ -12,7 +12,7 @@ questions = {
     "sub" : {
         "vars" : [
         ],
-        "test" : [
+        "tests" : [
             (1, 2),
             (3, 3)
         ]

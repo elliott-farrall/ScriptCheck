@@ -1,0 +1,11 @@
+SCRIPT: 	script1
+
+QUESTION: 	add
+	INPUT: 	(1, 2) 	                        PASSED
+		VAR: 	tmpppppppppp                         PASSED
+	INPUT: 	(3, 4) 	                        PASSED
+		VAR: 	tmpppppppppp                         PASSED
+
+QUESTION: 	sub
+	INPUT: 	(1, 2) 	                        PASSED
+	INPUT: 	(3, 3) 	                        PASSED
