@@ -1,74 +1,97 @@
+import re
+import os
 import sys
-import importlib
+import warnings
+from importlib import import_module
+from copy import deepcopy
 from pathlib import Path
 
 from questions import *
 
 def check(submission):
-    with open(f'src/feedback/{submission.stem}.txt', 'a') as out:
-        print(f'Checking {submission.stem}...')
-        out.write(f'SCRIPT: \t{submission.stem}\n')
+    with open(submission.with_suffix('.txt'), 'a') as out:
+        print(f'Checking {submission}...')
+        out.write(f'SCRIPT: \t{submission}\n')
 
-        for question, attrs in questions.items():
+        # Import python files, redirecting stdout to supress print statements
+        stdout = sys.stdout
+        try:
+            sys.stdout = open(os.devnull, 'w')
+            script_submission = import_module(f'submissions.{submission.stem}')
+            script_solution = import_module(f'solutions')
+            sys.stdout = stdout
+        except Exception:
+            print(f'Failed to import {submission}') 
+            out.write(f'\tIMPORT ERROR\n')
+            sys.stdout = stdout
+            return
+
+        for question, tests in questions.items():
             print(f'\tChecking {question}...')
             out.write(f'\nQUESTION: \t{question}\n')
 
-            question_submission = getattr(importlib.import_module(f'submissions.{submission.stem}'), question)
-            question_solution = getattr(importlib.import_module(f'solutions'), question)
-
-            def trace_solution(frame, event, arg):
-                if event == 'return':
-                    for var in attrs['vars']:
-                        vars_solution[var] = frame.f_locals.get(var)
-                return trace_solution
-            def trace_submission(frame, event, arg):
-                if event == 'return':
-                    for var in attrs['vars']:
-                        vars_submission[var] = frame.f_locals.get(var)
-                return trace_submission
+            try:
+                question_submission = getattr(script_submission, question)
+                question_solution = getattr(script_solution, question)
+            except AttributeError:
+                print(f'\t\tFailed to import {question}')
+                out.write(f'\t\tMISSING\n')
+                continue
+            if type(question_submission) != type(question_solution):
+                print(f'\t\tFailed to import {question}')
+                out.write(f'\t\tMISSING\n')
+                continue
             
-            for test in attrs['tests']:
-                print(f'\t\tTrying {test}...')
+            for idx, test in enumerate(tests):
+                print(f'\t\tRunning Test {idx+1}...')
 
-                sys.settrace(trace_solution)
-                vars_solution = {}
-                result_solution = question_solution(*test)
-                sys.settrace(None)
-
+                # Execute code using copy of test input, redirecting stdout to supress print statements
+                inputs = deepcopy(test)
+                stdout = sys.stdout
                 try:
-                    sys.settrace(trace_submission)
-                    vars_submission = {}
-                    result_submission = question_submission(*test)
-                    sys.settrace(None)
-                except Exception as e:
-                    result_submission = e
+                    sys.stdout = open(os.devnull, 'w')
+                    result_submission = question_submission(*inputs)
+                    result_solution = question_solution(*inputs)
+                    sys.stdout = stdout
+                except Exception as error:
+                    out.write(f'\tTEST {idx+1} \t{"ERROR" : >30}\n')
+                    out.write(f'\t\t{error}\n')
+                    continue
 
-
-                if result_submission == result_solution:
-                    out.write(f'\tINPUT: \t{test} \t{"PASSED" : >30}\n')
-                else:
-                    out.write(f'\tINPUT: \t{test} \t{"FAILED" : >30}\n')
+                if type(result_submission) != type(result_solution):
+                    out.write(f'\tTEST {idx+1} \t{"FORMAT ISSUE" : >30}\n')
                     out.write(f'\t\tSOLUTION: \t\t{result_solution}\n')
                     out.write(f'\t\tSUBMISSION: \t{result_submission}\n')
-
-                for var in attrs['vars']:
-                    if vars_submission[var] == vars_solution[var]:
-                        out.write(f'\t\tVAR: \t{var} {"PASSED" : >30}\n')
-                    else:
-                        out.write(f'\t\tVAR: \t{var} {"FAILED" : >30}\n')
-                        out.write(f'\t\t\tSOLUTION: \t\t{vars_solution[var]}\n')
-                        out.write(f'\t\t\tSUBMISSION: \t{vars_submission[var]}\n')
+                elif result_submission != result_solution:
+                    out.write(f'\tTEST {idx+1} \t{"FAILED" : >30}\n')
+                    out.write(f'\t\tSOLUTION: \t\t{result_solution}\n')
+                    out.write(f'\t\tSUBMISSION: \t{result_submission}\n')
+                else:
+                    out.write(f'\tTEST {idx+1} \t{"PASSED" : >30}\n')
+                    
                 
 
 if __name__ == '__main__':
     SUBMISSIONS = Path('src/submissions')
-    FEEDBACK = Path('src/feedback')
+    IVALID_CHARS = r'[.]'
 
-    for feedback in FEEDBACK.glob('*.txt'):
+    print('Initialising...')
+
+    # Cleanup existing feedback files
+    print('Cleanuing up old feedback files...')
+    for feedback in SUBMISSIONS.glob('**/*.txt'):
         feedback.unlink()
-    FEEDBACK.mkdir(parents=True, exist_ok=True)
 
-    print('Initialising...\n')
-    for submission in SUBMISSIONS.glob('*.py'):
-        check(submission)
-    print('Done.')
+    # Rename any files containing unsupported characters
+    print('Renaming files with unsupported characters...')
+    for submission in SUBMISSIONS.glob('**/*.py'):
+        name = re.sub(IVALID_CHARS, '_', submission.stem) + '.py'
+        submission.rename(SUBMISSIONS / name)
+
+    # Run checks
+    print('Starting checks...\n')
+    for submission in SUBMISSIONS.glob('**/*.py'):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            check(submission)
+    print('Done!')
