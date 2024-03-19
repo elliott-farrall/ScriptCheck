@@ -73,7 +73,7 @@ def check(submission):
 
 if __name__ == '__main__':
     SUBMISSIONS = Path('src/submissions')
-    IVALID_CHARS = r'[.]'   #TODO How to handle . in filename when importing as module?
+    INVALID_CHARS = r'[.]'   #TODO How to handle . in filename when importing as module?
 
     print('Initialising...')
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     # Rename any files containing unsupported characters
     print('Renaming files with unsupported characters...')
     for submission in SUBMISSIONS.glob('**/*.py'):
-        name = re.sub(IVALID_CHARS, '_', submission.stem) + '.py'
+        name = re.sub(INVALID_CHARS, '_', submission.stem) + '.py'
         submission.rename(SUBMISSIONS / name)
 
     # Run checks
