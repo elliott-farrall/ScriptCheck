@@ -13,6 +13,5 @@
 				"MichaelCurrin.auto-commit-msg"
 			]
 		}
-	},
-	"initializeCommand": "xhost +"
+	}
 }
