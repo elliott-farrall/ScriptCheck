@@ -13,7 +13,7 @@ def check(submission):
         print(f'Checking {submission}...')
         out.write(f'SCRIPT: \t{submission}\n')
 
-        # Import python files, redirecting stdout to supress print statements
+        # Import python files, redirecting stdout to suppress print statements
         stdout = sys.stdout
         try:
             sys.stdout = open(os.devnull, 'w')
@@ -45,7 +45,7 @@ def check(submission):
             for idx, test in enumerate(tests):
                 print(f'\t\tRunning Test {idx+1}...')
 
-                # Execute code using copy of test input, redirecting stdout to supress print statements
+                # Execute code using copy of test input, redirecting stdout to suppress print statements
                 inputs = deepcopy(test)
                 stdout = sys.stdout
                 try:
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     print('Initialising...')
 
     # Cleanup existing feedback files
-    print('Cleanuing up old feedback files...')
+    print('Cleaning up old feedback files...')
     for feedback in SUBMISSIONS.glob('**/*.txt'):
         feedback.unlink()
 
