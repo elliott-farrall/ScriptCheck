@@ -73,7 +73,7 @@ def check(submission):
 
 if __name__ == '__main__':
     SUBMISSIONS = Path('src/submissions')
-    IVALID_CHARS = r'[.]'
+    IVALID_CHARS = r'[.]'   #TODO How to handle . in filename when importing as module?
 
     print('Initialising...')
 
