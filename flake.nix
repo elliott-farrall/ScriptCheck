@@ -22,10 +22,10 @@
       in
       {
         devShells = {
-          default = pkgs.mkShell {
-            packages = with pkgs; [ poetry python3Full ];
+          default = pkgs.mkShell rec {
+            packages = with pkgs; [ poetry python3Full zlib ];
 
-            LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
+            LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.lib.makeLibraryPath packages}:";
 
             POETRY_VIRTUALENVS_IN_PROJECT = true;
             shellHook = ''

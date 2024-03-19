@@ -59,7 +59,7 @@ def check(submission):
                     continue
 
                 if type(result_submission) != type(result_solution):
-                    out.write(f'\tTEST {idx+1} \t{"FORMAT ISSUE" : >30}\n')
+                    out.write(f'\tTEST {idx+1} \t{"FORMAT" : >30}\n')
                     out.write(f'\t\tSOLUTION: \t\t{result_solution}\n')
                     out.write(f'\t\tSUBMISSION: \t{result_submission}\n')
                 elif result_submission != result_solution:

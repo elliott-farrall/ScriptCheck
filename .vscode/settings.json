@@ -1,5 +1,5 @@
 {
     "code-runner.executorMap": {
-        "python": "poetry run python -u $fileName"
+        "python": "poetry run python $fullFileName"
     }
 }
