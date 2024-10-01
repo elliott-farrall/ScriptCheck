@@ -10,7 +10,7 @@ packages = [{ include = "src", to = "scriptcheck" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numpy = "^2.1.0"
+numpy = "^2.1.1"
 tqdm = "^4.66.5"
 tqdm-stubs = "^0.2.1"
 
